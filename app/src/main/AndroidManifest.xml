@@ -21,7 +21,8 @@
         </activity>
         <activity
             android:name=".views.NewsContentActivity"
-            android:label="@string/title_activity_news_content" >
+            android:label="@string/app_name"
+            android:theme="@style/FadingTheme.TranslucentActionBar">
         </activity>
     </application>
 
