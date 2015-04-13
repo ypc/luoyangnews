@@ -25,7 +25,6 @@ public class MainActivity extends ActionBarActivity {
     private SlidingTabLayout slidingTabLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private String[] titles = new String[] {"洛阳新闻", "河洛时评", "经典洛阳"};
     private Toolbar toolbar;
 
     @Override
@@ -41,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         pager = (ViewPager) findViewById(R.id.viewpager);
-        pager.setAdapter(new MyFragmentPageAdapter(getSupportFragmentManager(), titles));
+        pager.setAdapter(new MyFragmentPageAdapter(getSupportFragmentManager()));
 
         slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tab);
         slidingTabLayout.setViewPager(pager);

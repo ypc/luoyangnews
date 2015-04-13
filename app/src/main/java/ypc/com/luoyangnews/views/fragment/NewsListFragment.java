@@ -1,41 +1,49 @@
 package ypc.com.luoyangnews.views.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import ypc.com.luoyangnews.R;
+import ypc.com.luoyangnews.model.NewsInfo;
+import ypc.com.luoyangnews.utils.CategoryUtils;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * Use the {@link NewsListFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * 新闻列表页
  */
 public class NewsListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_CATEGORY = "category";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String category;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @return A new instance of fragment LuoyangXinWenFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NewsListFragment newInstance(String param1) {
+    private ListView lvNewsList;
+    private List<NewsInfo> newsInfos;
+    NewsListAdapter newsAdapter;
+
+    private Context appContext;
+
+
+    public static NewsListFragment newInstance(String category) {
         NewsListFragment fragment = new NewsListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_CATEGORY, category);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,23 +56,91 @@ public class NewsListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            category = getArguments().getString(ARG_CATEGORY);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_newslist, container, false);
-    }
+        View v = inflater.inflate(R.layout.fragment_newslist, container, false);
+        appContext = getActivity().getApplicationContext();
 
+        lvNewsList = (ListView) v.findViewById(R.id.lv_newslist);
+        newsInfos = new ArrayList<>();
+        newsAdapter = new NewsListAdapter(inflater);
+        lvNewsList.setAdapter(newsAdapter);
+        return v;
+    }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onResume() {
+        super.onResume();
+        HttpUtils http = new HttpUtils();
+        http.configResponseTextCharset("GB2312");
+        http.send(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category), new RequestCallBack<String>() {
+            @Override
+            public void onSuccess(ResponseInfo<String> objectResponseInfo) {
+                newsInfos.addAll(NewsInfo.parse(objectResponseInfo.result));
+                newsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(HttpException e, String s) {
+                Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    public final class NewsListViewHolder {
+        public ImageView image;
+        public TextView title;
+        public TextView desc;
+    }
 
+    /**
+     * 自定义NewsList的适配器
+     */
+    class NewsListAdapter extends BaseAdapter {
+
+        private LayoutInflater mInflater;
+
+        NewsListAdapter(LayoutInflater mInflater) {
+            this.mInflater = mInflater;
+        }
+
+        @Override
+        public int getCount() {
+            return newsInfos.size();
+        }
+
+        @Override
+        public NewsInfo getItem(int position) {
+            return newsInfos.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            NewsListViewHolder holder;
+            if (convertView == null) {
+                holder = new NewsListViewHolder();
+                convertView = mInflater.inflate(R.layout.newslist_item, null);
+                holder.image = (ImageView) convertView.findViewById(R.id.iv_newslist_image);
+                holder.title = (TextView) convertView.findViewById(R.id.tv_newslist_title);
+                holder.desc = (TextView) convertView.findViewById(R.id.tv_newslist_desc);
+                convertView.setTag(holder);
+            } else {
+                holder = (NewsListViewHolder) convertView.getTag();
+            }
+            NewsInfo info = newsInfos.get(position);
+            holder.title.setText(info.getTitle());
+            holder.desc.setText(info.getDesc());
+            return convertView;
+        }
+    }
 }
