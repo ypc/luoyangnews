@@ -1,11 +1,13 @@
 package ypc.com.luoyangnews.views.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,11 +26,12 @@ import java.util.List;
 import ypc.com.luoyangnews.R;
 import ypc.com.luoyangnews.model.NewsInfo;
 import ypc.com.luoyangnews.utils.CategoryUtils;
+import ypc.com.luoyangnews.views.NewsContentActivity;
 
 /**
  * 新闻列表页
  */
-public class NewsListFragment extends Fragment {
+public class NewsListFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String ARG_CATEGORY = "category";
 
     private String category;
@@ -67,10 +70,26 @@ public class NewsListFragment extends Fragment {
         appContext = getActivity().getApplicationContext();
 
         lvNewsList = (ListView) v.findViewById(R.id.lv_newslist);
+        lvNewsList.setOnItemClickListener(this);
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);
         return v;
+    }
+
+    /**
+     * list条目点击事件
+     * @param parent
+     * @param view
+     * @param position
+     * @param id
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        NewsInfo info = newsInfos.get(position);
+        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+        intent.putExtra(NewsContentActivity.NEWSURL, info.getUrl());
+        startActivity(intent);
     }
 
     @Override
