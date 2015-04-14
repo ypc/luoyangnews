@@ -130,6 +130,7 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
         NewsInfo info = newsInfos.get(position);
         Intent intent = new Intent(getActivity(), NewsContentActivity.class);
         intent.putExtra(NewsContentActivity.NEWSURL, info.getUrl());
+        intent.putExtra(NewsContentActivity.NEWSTITLE, info.getTitle());
         startActivity(intent);
     }
 
@@ -216,8 +217,9 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
 
         @Override
         protected String doInBackground(String... params) {
+            //延迟2S加载数据，优化体验
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

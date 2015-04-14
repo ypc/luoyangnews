@@ -21,6 +21,8 @@ import com.manuelpeinado.fadingactionbar.extras.actionbarcompat.FadingActionBarH
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
 import ypc.com.luoyangnews.R;
@@ -28,12 +30,17 @@ import ypc.com.luoyangnews.R;
 public class NewsContentActivity extends ActionBarActivity {
 
     public static String NEWSURL = "news_url";
+    public static String NEWSTITLE = "news_title";
 
     private WebView wvContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String newsUrl = getIntent().getStringExtra(NEWSURL);
+        final String newsTitle = getIntent().getStringExtra(NEWSTITLE);
+
 
         //使用FadingActionBar初始化界面
         FadingActionBarHelper helper = new FadingActionBarHelper()
@@ -43,23 +50,20 @@ public class NewsContentActivity extends ActionBarActivity {
         setContentView(helper.createView(this));
         helper.initActionBar(this);
 
-        String url = getIntent().getStringExtra(NEWSURL);
 
         wvContent = (WebView) findViewById(R.id.wv_content);
 
         HttpUtils http = new HttpUtils();
         http.configResponseTextCharset("GB2312");
-        http.send(HttpRequest.HttpMethod.GET, url, new RequestCallBack<String>() {
+        http.send(HttpRequest.HttpMethod.GET, newsUrl, new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> objectResponseInfo) {
-                Display display = getWindowManager().getDefaultDisplay();
-                Point size = new Point();
-                display.getSize(size);
-                int width = size.x;
                 Document doc = Jsoup.parse(objectResponseInfo.result);
                 Element body = doc.select("#textbody").first();
-                Elements imgs = body.getElementsByTag("img");
+                //加入标题节点
+                body.child(0).before("<h2 align=\"center\">" + newsTitle + "</h2> <hr>");
                 //设置图片宽度为100%，webView就不会出现横向滚动条
+                Elements imgs = body.getElementsByTag("img");
                 for (Element img : imgs) {
                     img.attr("width", "100%");
                 }
@@ -68,7 +72,10 @@ public class NewsContentActivity extends ActionBarActivity {
                 for (int i = 0; i < 15; i++) {
                     body.append("<br />");
                 }
-                wvContent.loadDataWithBaseURL("", body.html(), "text/html", "GB2312", "");
+                //删除最后的洛阳新闻网的链接
+                Element bottomElem = body.select("span.style7").first();
+                bottomElem.remove();
+                wvContent.loadDataWithBaseURL("", body.outerHtml(), "text/html", "GB2312", "");
             }
 
             @Override
