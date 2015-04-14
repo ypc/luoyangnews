@@ -36,6 +36,7 @@ public class NewsContentActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //使用FadingActionBar初始化界面
         FadingActionBarHelper helper = new FadingActionBarHelper()
                 .actionBarBackground(R.drawable.ab_background)
                 .headerLayout(R.layout.header)
@@ -73,7 +74,7 @@ public class NewsContentActivity extends ActionBarActivity {
 
             @Override
             public void onFailure(HttpException e, String s) {
-                Toast.makeText(NewsContentActivity.this, "error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewsContentActivity.this, getResources().getString(R.string.internet_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -81,16 +82,12 @@ public class NewsContentActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_news_content, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement

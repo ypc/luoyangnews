@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import ypc.com.luoyangnews.R;
 import ypc.com.luoyangnews.model.NewsInfo;
+import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
 import ypc.com.luoyangnews.utils.CategoryUtils;
 import ypc.com.luoyangnews.views.NewsContentActivity;
 
@@ -33,6 +37,7 @@ import ypc.com.luoyangnews.views.NewsContentActivity;
  */
 public class NewsListFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String ARG_CATEGORY = "category";
+    private static final String TAG = "NewsListFragment";
 
     private String category;
 
@@ -41,6 +46,7 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
     NewsListAdapter newsAdapter;
 
     private Context appContext;
+    private BitmapUtils bitmapUtils;
 
 
     public static NewsListFragment newInstance(String category) {
@@ -68,9 +74,12 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_newslist, container, false);
         appContext = getActivity().getApplicationContext();
+        bitmapUtils = BitmapUtilsFactory.getInstance(appContext);
 
         lvNewsList = (ListView) v.findViewById(R.id.lv_newslist);
         lvNewsList.setOnItemClickListener(this);
+        //在listview快速滑动时暂停加载数据
+        lvNewsList.setOnScrollListener(new PauseOnScrollListener(bitmapUtils, false, true));
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);
@@ -95,22 +104,30 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, category + " on resume ------------");
         HttpUtils http = new HttpUtils();
         http.configResponseTextCharset("GB2312");
         http.send(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category), new RequestCallBack<String>() {
             @Override
             public void onSuccess(ResponseInfo<String> objectResponseInfo) {
+                //数据加载成功后更新adapter
                 newsInfos.addAll(NewsInfo.parse(objectResponseInfo.result));
                 newsAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(HttpException e, String s) {
-                Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getResources().getString(R.string.internet_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+
+
+
+    /**
+     * Listview Item缓存对象
+     */
     public final class NewsListViewHolder {
         public ImageView image;
         public TextView title;
@@ -159,6 +176,7 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
             NewsInfo info = newsInfos.get(position);
             holder.title.setText(info.getTitle());
             holder.desc.setText(info.getDesc());
+            bitmapUtils.display(holder.image, info.getImageUrl());
             return convertView;
         }
     }
