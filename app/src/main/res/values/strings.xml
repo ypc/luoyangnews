@@ -9,4 +9,14 @@
     <string name="title_activity_news_content">NewsContentActivity</string>
 
     <string name="internet_error">网络数据加载失败</string>
+
+    <!-- 下拉刷新 -->
+    <string name="drop_down_list_header_default_text">点击可以刷新</string>
+    <string name="drop_down_list_header_pull_text">下拉可以刷新</string>
+    <string name="drop_down_list_header_release_text">松开可以刷新</string>
+    <string name="drop_down_list_header_loading_text">加载中…</string>
+    <string name="drop_down_list_footer_default_text">更多</string>
+    <string name="drop_down_list_footer_loading_text">加载中…</string>
+    <string name="drop_down_list_footer_no_more_text">没有更多了</string>
+    <string name="update_at">更新于:</string>
 </resources>
