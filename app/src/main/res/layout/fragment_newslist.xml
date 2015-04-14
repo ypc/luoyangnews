@@ -3,27 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <in.srain.cube.views.ptr.PtrClassicFrameLayout
-        android:id="@+id/rotate_header_list_view_frame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/cube_mints_f1f1f1">
-
-
-        <ListView
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
             android:id="@+id/lv_newslist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:divider="@null"
-            android:fadingEdge="none"
-            android:listSelector="@android:color/transparent"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:scrollbarStyle="outsideOverlay"
             android:choiceMode="singleChoice" />
 
-
-    </in.srain.cube.views.ptr.PtrClassicFrameLayout>
 
 </RelativeLayout>

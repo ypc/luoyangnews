@@ -15,6 +15,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
@@ -28,10 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import in.srain.cube.views.ptr.PtrClassicFrameLayout;
-import in.srain.cube.views.ptr.PtrDefaultHandler;
-import in.srain.cube.views.ptr.PtrFrameLayout;
-import in.srain.cube.views.ptr.PtrHandler;
 import ypc.com.luoyangnews.R;
 import ypc.com.luoyangnews.model.NewsInfo;
 import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
@@ -48,10 +46,9 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
 
     private String category;
 
-    private ListView lvNewsList;
+    private PullToRefreshListView lvNewsList;
     private ArrayList<NewsInfo> newsInfos;
     NewsListAdapter newsAdapter;
-    private PtrClassicFrameLayout mPtrFrame;
 
     private Context appContext;
     private BitmapUtils bitmapUtils;
@@ -81,28 +78,38 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_newslist, container, false);
-        lvNewsList = (ListView) v.findViewById(R.id.lv_newslist);
+        lvNewsList = (PullToRefreshListView) v.findViewById(R.id.lv_newslist);
         appContext = getActivity().getApplicationContext();
         bitmapUtils = BitmapUtilsFactory.getInstance(appContext);
-
-        mPtrFrame = (PtrClassicFrameLayout) v.findViewById(R.id.rotate_header_list_view_frame);
-        mPtrFrame.setLastUpdateTimeRelateObject(this);
-        mPtrFrame.setPtrHandler(new PtrHandler() {
-            @Override
-            public void onRefreshBegin(PtrFrameLayout frame) {
-                RefreshNewsListTask task = new RefreshNewsListTask();
-                task.execute(category);
-            }
-
-            @Override
-            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return PtrDefaultHandler.checkContentCanBePulledDown(frame, content, header);
-            }
-        });
 
         lvNewsList.setOnItemClickListener(this);
         //在listview快速滑动时暂停加载图片数据
         lvNewsList.setOnScrollListener(new PauseOnScrollListener(bitmapUtils, false, true));
+        lvNewsList.setMode(PullToRefreshBase.Mode.BOTH);
+        lvNewsList.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ListView>() {
+            @Override
+            public void onPullDownToRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
+                new RefreshNewsListTask().execute(category);
+            }
+
+            @Override
+            public void onPullUpToRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
+                HttpUtils http = HttpUtilsFactory.getInstance();
+                http.send(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category), new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> objectResponseInfo) {
+                        newsInfos.addAll(NewsInfo.parse(objectResponseInfo.result));
+                        newsAdapter.notifyDataSetChanged();
+                        lvNewsList.onRefreshComplete();
+                    }
+
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+
+                    }
+                });
+            }
+        });
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);
@@ -209,6 +216,11 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
 
         @Override
         protected String doInBackground(String... params) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             HttpUtils http = HttpUtilsFactory.getInstance();
             try {
                 ResponseStream responseStream = http.sendSync(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category));
@@ -229,8 +241,8 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
             }
             newsInfos.clear();
             newsInfos.addAll(newData);
-            mPtrFrame.refreshComplete();
             newsAdapter.notifyDataSetChanged();
+            lvNewsList.onRefreshComplete();
         }
     }
 }
