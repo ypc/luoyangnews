@@ -13,7 +13,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -21,9 +20,7 @@ import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.bitmap.PauseOnScrollListener;
 import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.ResponseStream;
-import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 
 import java.io.IOException;
@@ -31,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ypc.com.luoyangnews.R;
+import ypc.com.luoyangnews.dao.NewsDao;
 import ypc.com.luoyangnews.model.NewsInfo;
 import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
 import ypc.com.luoyangnews.utils.CategoryUtils;
@@ -40,11 +38,13 @@ import ypc.com.luoyangnews.views.NewsContentActivity;
 /**
  * 新闻列表页
  */
-public class NewsListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class NewsListFragment extends Fragment {
     private static final String ARG_CATEGORY = "category";
     private static final String TAG = "NewsListFragment";
 
     private String category;
+    private String nextPageUrl;
+    private int currentPageNum;
 
     private PullToRefreshListView lvNewsList;
     private ArrayList<NewsInfo> newsInfos;
@@ -52,7 +52,7 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
 
     private Context appContext;
     private BitmapUtils bitmapUtils;
-
+    private NewsDao newsDao;
 
     public static NewsListFragment newInstance(String category) {
         NewsListFragment fragment = new NewsListFragment();
@@ -81,79 +81,47 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
         lvNewsList = (PullToRefreshListView) v.findViewById(R.id.lv_newslist);
         appContext = getActivity().getApplicationContext();
         bitmapUtils = BitmapUtilsFactory.getInstance(appContext);
+        newsDao = new NewsDao(getActivity());
 
-        lvNewsList.setOnItemClickListener(this);
+        lvNewsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NewsInfo info = (NewsInfo) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(getActivity(), NewsContentActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(NewsContentActivity.NEWSINFO, info);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
         //在listview快速滑动时暂停加载图片数据
         lvNewsList.setOnScrollListener(new PauseOnScrollListener(bitmapUtils, false, true));
         lvNewsList.setMode(PullToRefreshBase.Mode.BOTH);
         lvNewsList.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ListView>() {
             @Override
             public void onPullDownToRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
-                new RefreshNewsListTask().execute(category);
+                new LoadnewsDataTask().execute();
             }
 
             @Override
             public void onPullUpToRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
-                HttpUtils http = HttpUtilsFactory.getInstance();
-                http.send(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category), new RequestCallBack<String>() {
-                    @Override
-                    public void onSuccess(ResponseInfo<String> objectResponseInfo) {
-                        newsInfos.addAll(NewsInfo.parse(objectResponseInfo.result));
-                        newsAdapter.notifyDataSetChanged();
-                        lvNewsList.onRefreshComplete();
-                    }
-
-                    @Override
-                    public void onFailure(HttpException e, String s) {
-
-                    }
-                });
+                new LoadnewsDataTask().execute(nextPageUrl, (++currentPageNum) + "");
             }
         });
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);
 
-
         return v;
-    }
-
-    /**
-     * list条目点击事件
-     * @param parent
-     * @param view
-     * @param position
-     * @param id
-     */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        NewsInfo info = newsInfos.get(position);
-        Intent intent = new Intent(getActivity(), NewsContentActivity.class);
-        intent.putExtra(NewsContentActivity.NEWSURL, info.getUrl());
-        intent.putExtra(NewsContentActivity.NEWSTITLE, info.getTitle());
-        startActivity(intent);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        HttpUtils http = HttpUtilsFactory.getInstance();
-        http.send(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category), new RequestCallBack<String>() {
-            @Override
-            public void onSuccess(ResponseInfo<String> objectResponseInfo) {
-                //数据加载成功后更新adapter
-                newsInfos.addAll(NewsInfo.parse(objectResponseInfo.result));
-                newsAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onFailure(HttpException e, String s) {
-                Toast.makeText(getActivity(), getResources().getString(R.string.internet_error), Toast.LENGTH_SHORT).show();
-            }
-        });
+        //初始化加载数据
+        new LoadnewsDataTask().execute();
+        currentPageNum = 1;
     }
-
-
 
 
     /**
@@ -213,20 +181,38 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
     }
 
 
-    class RefreshNewsListTask extends AsyncTask<String, Integer, String> {
+    /**
+     * 执行从互联网加载数据的异步线程
+     */
+    class LoadnewsDataTask extends AsyncTask<String, Integer, List<NewsInfo>> {
+
+        private String urlAddress;
+        private int pageNum;
+        private boolean loadMore = false;
 
         @Override
-        protected String doInBackground(String... params) {
-            //延迟2S加载数据，优化体验
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        protected List<NewsInfo> doInBackground(String... params) {
+            if (params.length > 0) {
+                urlAddress = params[0];
+                pageNum = Integer.parseInt(params[1]);
+                loadMore = true;
+            } else {
+                //如果没有传递参数进来，URL地址就是默认的首页地址
+                urlAddress = CategoryUtils.getAddress(category);
+                pageNum = 1;
             }
             HttpUtils http = HttpUtilsFactory.getInstance();
             try {
-                ResponseStream responseStream = http.sendSync(HttpRequest.HttpMethod.GET, CategoryUtils.getAddress(category));
-                return responseStream.readString();
+                ResponseStream responseStream = http.sendSync(HttpRequest.HttpMethod.GET, urlAddress);
+                String resultStr =  responseStream.readString();
+                StringBuilder sb = new StringBuilder();
+                List<NewsInfo> newData = NewsInfo.parse(resultStr, sb);
+                nextPageUrl = sb.toString();
+                for (NewsInfo i : newData) {
+                    i.setCategory(category);
+                }
+                newsDao.saveToDb(newData);
+                return newsDao.findByPage(pageNum, category);
             } catch (HttpException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -236,13 +222,13 @@ public class NewsListFragment extends Fragment implements AdapterView.OnItemClic
         }
 
         @Override
-        protected void onPostExecute(String response) {
-            List<NewsInfo> newData = NewsInfo.parse(response);
-            for (NewsInfo n : newData) {
-                n.setTitle("new " + n.getTitle());
+        protected void onPostExecute(List<NewsInfo> infos) {
+
+            //如果是下拉刷新，清空旧数据
+            if (!loadMore) {
+                newsInfos.clear();
             }
-            newsInfos.clear();
-            newsInfos.addAll(newData);
+            newsInfos.addAll(infos);
             newsAdapter.notifyDataSetChanged();
             lvNewsList.onRefreshComplete();
         }
