@@ -46,6 +46,21 @@ public class NewsDao {
 
 
     /**
+     * 根据ID获取指定的新闻数据
+     * @param id
+     * @return
+     */
+    public NewsInfo findById(int id) {
+        try {
+            return db.findById(NewsInfo.class, id);
+        } catch (DbException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
      * 保存新加载的数据到缓存中，在保存过程中会自动跳过已经存在的数据
      * @param infos
      */
@@ -56,6 +71,18 @@ public class NewsDao {
                     db.save(info);
                 }
             }
+        } catch (DbException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 更新对象到数据库
+     * @param info
+     */
+    public void update(NewsInfo info) {
+        try {
+            db.update(info, "content");
         } catch (DbException e) {
             e.printStackTrace();
         }

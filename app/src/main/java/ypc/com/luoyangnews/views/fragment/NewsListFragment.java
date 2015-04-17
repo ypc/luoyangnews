@@ -89,9 +89,7 @@ public class NewsListFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NewsInfo info = (NewsInfo) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(getActivity(), NewsContentActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable(NewsContentActivity.NEWSINFO, info);
-                intent.putExtras(bundle);
+                intent.putExtra(NewsContentActivity.NEWSID, info.getId());
                 startActivity(intent);
             }
         });
