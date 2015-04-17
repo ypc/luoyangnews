@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,13 +111,12 @@ public class NewsListFragment extends Fragment {
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);
+        initData();
 
         return v;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void initData() {
         //初始化加载数据
         new LoadnewsDataTask().execute();
         currentPageNum = 1;
@@ -175,7 +175,11 @@ public class NewsListFragment extends Fragment {
             holder.title.setText(info.getTitle());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             holder.putDate.setText(sdf.format(info.getPubDate()));
-            bitmapUtils.display(holder.image, info.getImageUrl());
+            //为ImageView设置一个TAG标志，在不需要重新display的时候跳过，解决listview闪烁的问题
+            if (!info.getImageUrl().equals(holder.image.getTag())) {
+                bitmapUtils.display(holder.image, info.getImageUrl());
+                holder.image.setTag(info.getImageUrl());
+            }
             return convertView;
         }
     }

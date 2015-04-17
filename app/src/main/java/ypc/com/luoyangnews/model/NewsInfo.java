@@ -111,7 +111,9 @@ public class NewsInfo implements Serializable {
         }
         //删除最后的洛阳新闻网的链接
         Element bottomElem = body.select("span.style7").first();
-        bottomElem.remove();
+        if (bottomElem != null) {
+            bottomElem.remove();
+        }
         content = body.outerHtml();
     }
 
