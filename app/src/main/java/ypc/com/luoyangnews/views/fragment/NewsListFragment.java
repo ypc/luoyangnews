@@ -24,6 +24,7 @@ import com.lidroid.xutils.http.ResponseStream;
 import com.lidroid.xutils.http.client.HttpRequest;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -130,7 +131,7 @@ public class NewsListFragment extends Fragment {
     public final class NewsListViewHolder {
         public ImageView image;
         public TextView title;
-        public TextView desc;
+        public TextView putDate;
     }
 
     /**
@@ -167,14 +168,15 @@ public class NewsListFragment extends Fragment {
                 convertView = mInflater.inflate(R.layout.newslist_item, null);
                 holder.image = (ImageView) convertView.findViewById(R.id.iv_newslist_image);
                 holder.title = (TextView) convertView.findViewById(R.id.tv_newslist_title);
-                holder.desc = (TextView) convertView.findViewById(R.id.tv_newslist_desc);
+                holder.putDate = (TextView) convertView.findViewById(R.id.tv_newslist_pubdate);
                 convertView.setTag(holder);
             } else {
                 holder = (NewsListViewHolder) convertView.getTag();
             }
             NewsInfo info = newsInfos.get(position);
             holder.title.setText(info.getTitle());
-            holder.desc.setText(info.getDesc());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            holder.putDate.setText(sdf.format(info.getPubDate()));
             bitmapUtils.display(holder.image, info.getImageUrl());
             return convertView;
         }

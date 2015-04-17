@@ -13,8 +13,9 @@
         <item name="colorPrimary">@color/material_deep_teal_500</item>
         <!-- colorPrimaryDark is used for the status bar -->
         <item name="colorPrimaryDark">@color/material_deep_teal_500</item>
-        <!-- colorAccent is used as the default value for colorControlActivated
-             which is used to tint widgets -->
+        <!-- toolbar 字体颜色 -->
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <!-- 各控制元件颜色 -->
         <item name="colorAccent">@color/primary_text_default_material_dark</item>
 
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>

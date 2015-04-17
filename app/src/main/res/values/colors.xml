@@ -8,4 +8,11 @@
     <color name="drop_down_list_footer_font_color">#000000</color>
 
     <color name="cube_mints_f1f1f1">#f1f1f1</color>
+
+    <color name="back_ground_color">#EEEEEE</color>
+    <color name="item_back_ground_color">#FFFFFF</color>
+    <color name="light_primary_color">#B2DFDB</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="divider_color">#B6B6B6</color>
 </resources>
