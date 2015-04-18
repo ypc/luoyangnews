@@ -137,7 +137,6 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 float translationY = (Float) animator.getAnimatedValue();
-                Log.i(NewsListFragment.TAG, "AnimatedValue:" + translationY);
                 toolbar.setTranslationY(translationY);
                 content.setTranslationY(translationY);
                 FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) content.getLayoutParams();

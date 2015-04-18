@@ -128,15 +128,17 @@ public class NewsListFragment extends Fragment {
                 int top = (view == null) ? 0 : view.getTop();
 
                 if (firstVisibleItem == oldFirstVisibleItem) {
-                    if (top > oldTop) {
-                        //down
-                        if (mainActivity.toolbarIsHidden()) {
-                            mainActivity.showToolbar();
-                        }
-                    } else if (top < oldTop) {
-                        //up
-                        if (mainActivity.toolbarIsShown()) {
-                            mainActivity.hideToolbar();
+                    if (Math.abs(top - oldTop) > 10) {  /*偏移量超过10像素才算滚动*/
+                        if (top > oldTop) {
+                            //down
+                            if (mainActivity.toolbarIsHidden()) {
+                                mainActivity.showToolbar();
+                            }
+                        } else if (top < oldTop) {
+                            //up
+                            if (mainActivity.toolbarIsShown()) {
+                                mainActivity.hideToolbar();
+                            }
                         }
                     }
                 } else {
