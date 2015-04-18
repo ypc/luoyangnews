@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lidroid.xutils.HttpUtils;
@@ -25,6 +26,7 @@ public class NewsContentActivity extends ActionBarActivity {
     public static String NEWSID = "news_id";
 
     private WebView wvContent;
+    private TextView tvHeaderTitle;
     private int newsId;
     private NewsInfo info;
 
@@ -40,7 +42,7 @@ public class NewsContentActivity extends ActionBarActivity {
 
         //使用FadingActionBar初始化界面
         FadingActionBarHelper helper = new FadingActionBarHelper()
-                .actionBarBackground(R.drawable.ab_background)
+                .actionBarBackground(R.drawable.ab_background2)
                 .headerLayout(R.layout.header)
                 .contentLayout(R.layout.activity_news_content);
         setContentView(helper.createView(this));
@@ -48,7 +50,9 @@ public class NewsContentActivity extends ActionBarActivity {
 
 
         wvContent = (WebView) findViewById(R.id.wv_content);
+        tvHeaderTitle = (TextView) findViewById(R.id.tv_header_title);
         info = newsDao.findById(newsId);
+        tvHeaderTitle.setText(info.getTitle());
         if (!TextUtils.isEmpty(info.getContent())) {
             wvContent.loadDataWithBaseURL("", info.getContent(), "text/html", "GB2312", "");
         } else {

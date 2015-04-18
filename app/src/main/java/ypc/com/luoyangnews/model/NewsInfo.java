@@ -98,7 +98,7 @@ public class NewsInfo implements Serializable {
         Document doc = Jsoup.parse(content);
         Element body = doc.select("#textbody").first();
         //加入标题节点
-        body.child(0).before("<h2 align=\"center\">" + title + "</h2> <hr>");
+//        body.child(0).before("<h2 align=\"center\">" + title + "</h2> <hr>");
         //设置图片宽度为100%，webView就不会出现横向滚动条
         Elements imgs = body.getElementsByTag("img");
         for (Element img : imgs) {
