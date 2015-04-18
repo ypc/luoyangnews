@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ import ypc.com.luoyangnews.model.NewsInfo;
 import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
 import ypc.com.luoyangnews.utils.CategoryUtils;
 import ypc.com.luoyangnews.utils.HttpUtilsFactory;
+import ypc.com.luoyangnews.views.MainActivity;
 import ypc.com.luoyangnews.views.NewsContentActivity;
 
 /**
@@ -42,7 +44,7 @@ import ypc.com.luoyangnews.views.NewsContentActivity;
  */
 public class NewsListFragment extends Fragment {
     private static final String ARG_CATEGORY = "category";
-    private static final String TAG = "NewsListFragment";
+    public static final String TAG = "NewsListFragment";
 
     private String category;
     private String nextPageUrl;
@@ -106,6 +108,51 @@ public class NewsListFragment extends Fragment {
             @Override
             public void onPullUpToRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
                 new LoadnewsDataTask().execute(nextPageUrl, (++currentPageNum) + "");
+            }
+        });
+        //listview滚动事件，设置自动隐藏toolbar
+        lvNewsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            private int oldTop;
+            private int oldFirstVisibleItem;
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                View view = absListView.getChildAt(0);
+                int top = (view == null) ? 0 : view.getTop();
+
+                if (firstVisibleItem == oldFirstVisibleItem) {
+                    if (top > oldTop) {
+                        //down
+                        if (mainActivity.toolbarIsHidden()) {
+                            mainActivity.showToolbar();
+                        }
+                    } else if (top < oldTop) {
+                        //up
+                        if (mainActivity.toolbarIsShown()) {
+                            mainActivity.hideToolbar();
+                        }
+                    }
+                } else {
+                    if (firstVisibleItem < oldFirstVisibleItem) {
+                        if (mainActivity.toolbarIsHidden()) {
+                            mainActivity.showToolbar();
+                        }
+                    } else {
+                        if (mainActivity.toolbarIsShown()) {
+                            mainActivity.hideToolbar();
+                        }
+                    }
+                }
+
+                oldTop = top;
+                oldFirstVisibleItem = firstVisibleItem;
             }
         });
         newsInfos = new ArrayList<>();
