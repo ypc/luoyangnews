@@ -106,7 +106,7 @@ public class NewsInfo implements Serializable {
         }
         //fadingActionBar中的webView组件存在bug，会引起webview底部的一部分内容无法滚动到
         //在这里强制加入一些空行将webView布局撑高，变相解决bug问题
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 10; i++) {
             body.append("<br />");
         }
         //删除最后的洛阳新闻网的链接
