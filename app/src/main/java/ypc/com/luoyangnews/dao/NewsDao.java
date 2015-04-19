@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.db.sqlite.SqlInfo;
 import com.lidroid.xutils.exception.DbException;
 
 import java.util.List;
@@ -106,6 +107,17 @@ public class NewsDao {
         } catch (DbException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * 清空表中的缓存数据
+     */
+    public void cleanCache() {
+        try {
+            db.deleteAll(NewsInfo.class);
+        } catch (DbException e) {
+            e.printStackTrace();
         }
     }
 }

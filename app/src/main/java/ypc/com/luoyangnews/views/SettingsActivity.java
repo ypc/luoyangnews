@@ -10,7 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.lidroid.xutils.BitmapUtils;
+
 import ypc.com.luoyangnews.R;
+import ypc.com.luoyangnews.dao.NewsDao;
+import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -32,11 +36,11 @@ public class SettingsActivity extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.perference);
 
-        Preference p = findPreference("clearCache");
+        Preference p = findPreference("cleanCache");
         p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new ClearCacheTask().execute();
+                new CleanCacheTask().execute();
                 return false;
             }
         });
@@ -45,7 +49,7 @@ public class SettingsActivity extends PreferenceActivity {
     /**
      * 清理缓存的异步线程
      */
-    class ClearCacheTask extends AsyncTask<String, Void, Void> {
+    class CleanCacheTask extends AsyncTask<String, Void, Void> {
 
         ProgressDialog dialog = new ProgressDialog(SettingsActivity.this);
 
@@ -57,6 +61,11 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         protected Void doInBackground(String... params) {
+            BitmapUtils bitmapUtils = BitmapUtilsFactory.getInstance(SettingsActivity.this);
+            NewsDao newsDao = new NewsDao(getApplicationContext());
+            newsDao.cleanCache();
+            bitmapUtils.clearCache();
+            //清理实质上是在一个异步线程中，这里休眠3秒，优化用户交互效果
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {

@@ -10,7 +10,7 @@
             android:title="移动网络下加载图片"/>
 
         <Preference
-            android:key="clearCache"
+            android:key="cleanCache"
             android:title="清除缓存" />
 
     </PreferenceCategory>
