@@ -21,4 +21,5 @@
     <string name="update_at">更新于:</string>
     <string name="title_activity_about">关于</string>
     <string name="version">版本：1.0.0</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>

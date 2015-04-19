@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/action_settings">
+
+    <PreferenceCategory
+        android:title="通用">
+
+        <SwitchPreference
+            android:key="sw_loadImage"
+            android:title="移动网络下加载图片"/>
+
+        <Preference
+            android:key="clearCache"
+            android:title="清除缓存" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -3,8 +3,10 @@ package ypc.com.luoyangnews.views;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -75,7 +77,9 @@ public class MainActivity extends ActionBarActivity {
         tvDrawerShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, tvDrawerShare.getText(), Toast.LENGTH_SHORT).show();
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                Boolean loadImage = sp.getBoolean(SettingsActivity.CBX_LOADIMAGE, true);
+                Toast.makeText(MainActivity.this, "loadImage : " + loadImage, Toast.LENGTH_SHORT).show();
             }
         });
         //关于按钮
@@ -92,7 +96,8 @@ public class MainActivity extends ActionBarActivity {
         tvDrawerSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
         });
     }
