@@ -2,6 +2,7 @@ package ypc.com.luoyangnews.views;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.v4.view.ViewPager;
@@ -53,7 +54,7 @@ public class MainActivity extends ActionBarActivity {
             setSupportActionBar(toolbar);
         }
 
-        //设置seliingTable
+        //设置seliingTable和viewpager
         pager = (ViewPager) findViewById(R.id.viewpager);
         pager.setAdapter(new MyFragmentPageAdapter(getSupportFragmentManager()));
 
@@ -69,11 +70,29 @@ public class MainActivity extends ActionBarActivity {
         //设置侧滑菜单
         drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
         mDrawerLayout.setDrawerListener(drawerToggle);
+        //分享按钮
         final TextView tvDrawerShare = (TextView) mDrawer.findViewById(R.id.tv_drawer_share);
         tvDrawerShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, tvDrawerShare.getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        //关于按钮
+        TextView tvDrawerAbout = (TextView) mDrawer.findViewById(R.id.tv_drawer_about);
+        tvDrawerAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(intent);
+            }
+        });
+        //设置按钮
+        TextView tvDrawerSetting = (TextView) mDrawer.findViewById(R.id.tv_drawer_setting);
+        tvDrawerSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

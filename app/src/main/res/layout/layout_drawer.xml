@@ -69,6 +69,7 @@
         android:layout_alignParentBottom="true">
 
         <TextView
+            android:id="@+id/tv_drawer_setting"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/action_settings"

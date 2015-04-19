@@ -19,4 +19,6 @@
     <string name="drop_down_list_footer_loading_text">加载中…</string>
     <string name="drop_down_list_footer_no_more_text">没有更多了</string>
     <string name="update_at">更新于:</string>
+    <string name="title_activity_about">关于</string>
+    <string name="version">版本：1.0.0</string>
 </resources>

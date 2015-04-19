@@ -2,6 +2,14 @@
 
     <style name="MyTheme" parent="MyTheme.Base" />
 
+    <style name="MyTheme.ActionBar" parent="Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@color/material_deep_teal_500</item>
+        <item name="colorPrimaryDark">@color/material_deep_teal_500</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="colorAccent">@color/primary_text_default_material_dark</item>
+    </style>
+
 
     <!-- Base application theme. -->
     <style name="MyTheme.Base" parent="Theme.AppCompat.Light">
