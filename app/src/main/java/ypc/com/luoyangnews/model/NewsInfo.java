@@ -117,6 +117,17 @@ public class NewsInfo implements Serializable {
         content = body.outerHtml();
     }
 
+    public void removeImages() {
+        Document doc = Jsoup.parse(content);
+        Elements imageNodes = doc.getElementsByTag("img");
+        if (imageNodes != null) {
+            for (Element image : imageNodes) {
+                image.remove();
+            }
+        }
+        content = doc.outerHtml();
+    }
+
     public int getId() {
         return id;
     }

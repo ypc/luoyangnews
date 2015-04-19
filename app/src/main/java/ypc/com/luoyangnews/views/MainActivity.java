@@ -9,28 +9,22 @@ import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import ypc.com.luoyangnews.R;
-import ypc.com.luoyangnews.views.fragment.NewsListFragment;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActivity {
 
     private DrawerLayout mDrawerLayout;
     private ViewGroup mDrawer;
@@ -78,7 +72,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
-                Boolean loadImage = sp.getBoolean(SettingsActivity.CBX_LOADIMAGE, true);
+                Boolean loadImage = sp.getBoolean(SettingsActivity.SW_LOAD_IMAGE, true);
                 Toast.makeText(MainActivity.this, "loadImage : " + loadImage, Toast.LENGTH_SHORT).show();
             }
         });

@@ -14,7 +14,7 @@ import ypc.com.luoyangnews.R;
 
 public class SettingsActivity extends PreferenceActivity {
 
-    public static final String CBX_LOADIMAGE = "sw_loadImage";
+    public static final String SW_LOAD_IMAGE = "sw_loadImage";
 
 
     @Override

@@ -21,7 +21,7 @@ import ypc.com.luoyangnews.dao.NewsDao;
 import ypc.com.luoyangnews.model.NewsInfo;
 import ypc.com.luoyangnews.utils.HttpUtilsFactory;
 
-public class NewsContentActivity extends ActionBarActivity {
+public class NewsContentActivity extends BaseActivity {
 
     public static String NEWSID = "news_id";
 
@@ -54,6 +54,10 @@ public class NewsContentActivity extends ActionBarActivity {
         info = newsDao.findById(newsId);
         tvHeaderTitle.setText(info.getTitle());
         if (!TextUtils.isEmpty(info.getContent())) {
+            //移动网络下不加载图片
+            if (!allowLoadImage(NewsContentActivity.this)) {
+                info.removeImages();
+            }
             wvContent.loadDataWithBaseURL("", info.getContent(), "text/html", "GB2312", "");
         } else {
             HttpUtils http = HttpUtilsFactory.getInstance();
@@ -62,8 +66,11 @@ public class NewsContentActivity extends ActionBarActivity {
                 public void onSuccess(ResponseInfo<String> objectResponseInfo) {
                     info.setContent(objectResponseInfo.result);
                     info.filterContent();
-                    wvContent.loadDataWithBaseURL("", info.getContent(), "text/html", "GB2312", "");
                     newsDao.update(info);
+                    if (!allowLoadImage(NewsContentActivity.this)) {
+                        info.removeImages();
+                    }
+                    wvContent.loadDataWithBaseURL("", info.getContent(), "text/html", "GB2312", "");
                 }
 
                 @Override

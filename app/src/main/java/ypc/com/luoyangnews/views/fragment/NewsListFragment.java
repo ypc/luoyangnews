@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -224,10 +225,14 @@ public class NewsListFragment extends Fragment {
             holder.title.setText(info.getTitle());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             holder.putDate.setText(sdf.format(info.getPubDate()));
-            //为ImageView设置一个TAG标志，在不需要重新display的时候跳过，解决listview闪烁的问题
-            if (!info.getImageUrl().equals(holder.image.getTag())) {
-                bitmapUtils.display(holder.image, info.getImageUrl());
-                holder.image.setTag(info.getImageUrl());
+            //是否允许从网络加载图片
+            if (((MainActivity)getActivity()).allowLoadImage(getActivity())) {
+                //为ImageView设置一个TAG标志，在不需要重新display的时候跳过，解决listview闪烁的问题
+                if (!info.getImageUrl().equals(holder.image.getTag())) {
+
+                    bitmapUtils.display(holder.image, info.getImageUrl());
+                    holder.image.setTag(info.getImageUrl());
+                }
             }
             return convertView;
         }
@@ -281,9 +286,14 @@ public class NewsListFragment extends Fragment {
             if (!loadMore) {
                 newsInfos.clear();
             }
-            newsInfos.addAll(infos);
-            newsAdapter.notifyDataSetChanged();
-            lvNewsList.onRefreshComplete();
+            if (infos != null && infos.size() > 0) {
+                newsInfos.addAll(infos);
+                newsAdapter.notifyDataSetChanged();
+                lvNewsList.onRefreshComplete();
+            } else {
+                Toast.makeText(getActivity(), getResources().getString(R.string.internet_error), Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 }
