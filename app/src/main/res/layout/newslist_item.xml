@@ -16,7 +16,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            android:background="@drawable/view_click_state">
+            android:background="@drawable/item_click_state">
 
             <ImageView
                 android:id="@+id/iv_newslist_image"

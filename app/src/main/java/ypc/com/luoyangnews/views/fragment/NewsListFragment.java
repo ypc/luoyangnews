@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,7 +127,8 @@ public class NewsListFragment extends Fragment {
                 int top = (view == null) ? 0 : view.getTop();
 
                 if (firstVisibleItem == oldFirstVisibleItem) {
-                    if (Math.abs(top - oldTop) > 10) {  /*偏移量超过10像素才算滚动*/
+                    //偏移量超过10像素才算滚动
+                    if (Math.abs(top - oldTop) > 10) {
                         if (top > oldTop) {
                             //down
                             if (mainActivity.toolbarIsHidden()) {

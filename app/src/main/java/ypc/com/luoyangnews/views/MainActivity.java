@@ -15,10 +15,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import ypc.com.luoyangnews.R;
 import ypc.com.luoyangnews.views.fragment.NewsListFragment;
@@ -27,7 +30,8 @@ import ypc.com.luoyangnews.views.fragment.NewsListFragment;
 public class MainActivity extends ActionBarActivity {
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private ViewGroup mDrawer;
+
     private ViewPager pager;
     private SlidingTabLayout slidingTabLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -42,13 +46,14 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.navdrawer);
+        mDrawer = (ViewGroup) findViewById(R.id.drawer);
         content = (ViewGroup) findViewById(R.id.content);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
 
+        //设置seliingTable
         pager = (ViewPager) findViewById(R.id.viewpager);
         pager.setAdapter(new MyFragmentPageAdapter(getSupportFragmentManager()));
 
@@ -60,15 +65,17 @@ public class MainActivity extends ActionBarActivity {
                 return Color.WHITE;
             }
         });
+
+        //设置侧滑菜单
         drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
         mDrawerLayout.setDrawerListener(drawerToggle);
-
-        String[] values = new String[]{
-                "发送反馈", "关于"
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
-        mDrawerList.setAdapter(adapter);
+        final TextView tvDrawerShare = (TextView) mDrawer.findViewById(R.id.tv_drawer_share);
+        tvDrawerShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, tvDrawerShare.getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
