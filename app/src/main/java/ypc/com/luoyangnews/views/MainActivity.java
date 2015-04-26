@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -35,7 +36,9 @@ public class MainActivity extends BaseActivity {
 
     private Toolbar toolbar;
     private ViewGroup content;
-    private boolean toolbarAnimRunning = false;
+    private boolean toolbarAnimRunning = false;     //toolbar收缩的动画是否正在执行中
+
+    private boolean doubleBackToExitPressedOnce = false;    //双击退出
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,12 +121,35 @@ public class MainActivity extends BaseActivity {
         drawerToggle.syncState();
     }
 
+    /**
+     * 注册drawerLayout切换时的按钮效果
+     * @param newConfig
+     */
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
+    /**
+     * 双击退出
+     */
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(MainActivity.this, getResources().getString(R.string.double_exit), Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+    }
 
     public boolean toolbarIsShown(){
         return toolbar.getTranslationY() == 0;

@@ -18,6 +18,9 @@ import ypc.com.luoyangnews.utils.BitmapUtilsFactory;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    /**
+     * 移动网络下是否加载数据的开关
+     */
     public static final String SW_LOAD_IMAGE = "sw_loadImage";
 
 
