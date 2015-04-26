@@ -111,7 +111,7 @@ public class NewsListFragment extends Fragment {
             }
         });
         //listview滚动事件，设置自动隐藏toolbar
-        lvNewsList.setOnScrollListener(new AbsListView.OnScrollListener() {
+        /*lvNewsList.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             private int oldTop;
             private int oldFirstVisibleItem;
@@ -157,7 +157,7 @@ public class NewsListFragment extends Fragment {
                 oldTop = top;
                 oldFirstVisibleItem = firstVisibleItem;
             }
-        });
+        });*/
         newsInfos = new ArrayList<>();
         newsAdapter = new NewsListAdapter(inflater);
         lvNewsList.setAdapter(newsAdapter);

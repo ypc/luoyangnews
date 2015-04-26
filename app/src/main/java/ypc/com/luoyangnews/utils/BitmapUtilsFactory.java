@@ -16,8 +16,9 @@ public class BitmapUtilsFactory {
     public static BitmapUtils getInstance(Context context) {
         if (instance == null) {
             instance = new BitmapUtils(context);
+            //图像的加载动画
             AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
-            animation.setDuration(1000);
+            animation.setDuration(500);
             instance.configDefaultImageLoadAnimation(animation);
 
         }
