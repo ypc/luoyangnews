@@ -2,8 +2,10 @@ package ypc.com.luoyangnews.views.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +47,8 @@ import ypc.com.luoyangnews.views.NewsContentActivity;
 public class NewsListFragment extends Fragment {
     private static final String ARG_CATEGORY = "category";
     public static final String TAG = "NewsListFragment";
+    private static final String SP_LAST_UPDATE_TIME = "_last_update_time";  //储存在sharedPreference中的最后更新时间标识
+    private static final long FORE_HOUR_MILLSE = 4 * 60 * 60 * 1000;    //4个小时的毫秒数
 
     private String category;
     private String nextPageUrl;
@@ -167,9 +171,25 @@ public class NewsListFragment extends Fragment {
     }
 
     private void initData() {
-        //初始化加载数据
-        new LoadnewsDataTask().execute();
+        //初始从缓存中加载数据
         currentPageNum = 1;
+        newsInfos.addAll(newsDao.findByPage(currentPageNum, category));
+        newsAdapter.notifyDataSetChanged();
+        MainActivity activity = (MainActivity) getActivity();
+        if (!activity.getCategoryUpdated(category)) {
+            lvNewsList.setRefreshing();
+            activity.setCategoryUpdated(category);
+        }
+
+/*        //以下代码暂时注释，若初始化只加载缓存不加载网络数据，下一页URL地址无法解析出来
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        long lastUpdateTime = sp.getLong(category + SP_LAST_UPDATE_TIME, 0);
+        long now = System.currentTimeMillis();
+        if (now - lastUpdateTime > FORE_HOUR_MILLSE) {
+            //如果上次刷新时间已经超过4个小时，则触发自动刷新
+            lvNewsList.setRefreshing();
+            sp.edit().putLong(category + SP_LAST_UPDATE_TIME, now).commit();
+        }*/
     }
 
 

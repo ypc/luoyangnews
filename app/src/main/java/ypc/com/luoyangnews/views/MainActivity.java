@@ -22,6 +22,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import ypc.com.luoyangnews.R;
 
 
@@ -39,6 +41,8 @@ public class MainActivity extends BaseActivity {
     private boolean toolbarAnimRunning = false;     //toolbar收缩的动画是否正在执行中
 
     private boolean doubleBackToExitPressedOnce = false;    //双击退出
+
+    private HashMap<String, Boolean> categoryUpdated = new HashMap<String, Boolean>();   //当前分类数据是否已经执行过刷新加载
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +153,27 @@ public class MainActivity extends BaseActivity {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+    }
+
+    /**
+     * 获取该分类数据是否已经加载过
+     * @param category
+     * @return
+     */
+    public boolean getCategoryUpdated(String category) {
+        Boolean updated = categoryUpdated.get(category);
+        if (updated == null) {
+            updated = false;
+        }
+        return updated;
+    }
+
+    /**
+     * 设置该分类数据已经加载
+     * @param category
+     */
+    public void setCategoryUpdated(String category) {
+        categoryUpdated.put(category, true);
     }
 
     public boolean toolbarIsShown(){
